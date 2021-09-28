@@ -87,7 +87,53 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    # Empty stack is created to keep the track of the nodes which are not visited yet.
+    # Stack is used because DFS uses stack data structure.
+    opened = util.Stack()
+    
+    # Keeps the track of visited nodes.
+    closed = []
+    
+    # Keeps the track of all the nodes to reach to the goal node .
+    path = []
+    
+    # Cost to reach to the goal node.
+    pathCost = 0
+    
+    # Start node from which game starts.
+    startNode = problem.getStartState()
+    
+    # the opened list consists of the state, path to that node,
+    # and cost to reach to that node.
+    # Initially start node is pushed in the opened list.
+    opened.push((startNode, [], pathCost))
+    
+    # Loop until opened list becomes empty.
+    while not opened.isEmpty():
+        # pop() operation is performed on opened list.
+        # It returns current state, path to current node, and cost.
+        state, path, cost = opened.pop()
+        
+        # If current state is not in closed list, i.e. the node is not visited yet,
+        # then it is pushed in the closed list
+        if state not in closed:
+            closed.append(state)
+            
+            # Checks if the current state is goal state. If so then it returns the path to that node.
+            if problem.isGoalState(state):
+                return path
+            # getSuccessor() method returns the list of successors of the current node.
+            # it consists of the list of successors, paths to that successor and cost.
+            successors = problem.getSuccessors(state)
+            
+            # For each successor node, it checks whether the successor node is already visited or not.
+            # If not, then it pushes them into the open list.
+            for successor in successors:
+                if successor[0] not in closed:
+                    opened.push((successor[0], path + [(successor[1])], successor[2]))
+    
+    #util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
