@@ -290,6 +290,7 @@ class CornersProblem(search.SearchProblem):
         "*** YOUR CODE HERE ***"
         
         self.start = self.startingPosition
+        self.closed = []
 
     def getStartState(self):
         """
@@ -297,7 +298,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        return(self.start, [])
+        return(self.start, self.closed)
         # util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -306,12 +307,12 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         position = state[0]
-        exploredCornerList = state[1]
+        closed = state[1]
         if position in self.corners:
-            if position not in exploredCornerList:
-                exploredCornerList.append(position)
+            if position not in closed:
+                closed.append(position)
             else:
-                if(len(exploredCornerList) == 4):
+                if(len(closed) == len(self.corners)):
                     return True
                 else:
                     return False
@@ -387,7 +388,42 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    from util import manhattanDistance
+    
+    #Here we will try to find out the manhattan distance from the current state to all the corners.
+    currentState = state[0]
+    # List of nodes that have been explored till now.
+    closed = state[1]
+    # Open list to keep the track of unvisited corners.
+    opened = []
+    
+    # Looping through all the corners, i.e. range(len(corners))
+    # and checking whether they are visited or not, i.e. closed list.
+    # If they are not visited then we will append them in the opened list.
+    for i in range(len(corners)):
+        if corners[i] not in closed:
+            opened.append(corners[i])
+            
+    # Variable to store the total cost to the corner.        
+    heuristic = 0
+    cornerDistance = []
+    # As opened list stores the state of all the unvisited corners,
+    # we will loop through the opened list and will calculate the manhattan distance from 
+    # current node to all the corners residing in the opened list turn by turn.
+    # We will first explore the corner having the lowest value of manhattan distance and then it is removed from the opened list.
+    # Now we will use this selected corner as a current state and repeat the same process untill opened list becomes empty.
+    while(len(opened)!=0):
+        """ for corner in opened:
+            manhattan_Distance = manhattanDistance(currentState, corner)
+            cornerDistance.append((manhattan_Distance,corner))
+        distance,corner = min(cornerDistance)
+        #"""
+        distance, corner = min( [(manhattanDistance(currentState ,corner),corner) for corner in opened] )
+        heuristic = heuristic + distance
+        currentState = corner
+        opened.remove(corner) 
+
+    return heuristic 
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
