@@ -406,21 +406,27 @@ def cornersHeuristic(state, problem):
             
     # Variable to store the total cost to the corner.        
     heuristic = 0
-    cornerDistance = []
+  
     # As opened list stores the state of all the unvisited corners,
     # we will loop through the opened list and will calculate the manhattan distance from 
     # current node to all the corners residing in the opened list turn by turn.
     # We will first explore the corner having the lowest value of manhattan distance and then it is removed from the opened list.
     # Now we will use this selected corner as a current state and repeat the same process untill opened list becomes empty.
-    while(len(opened)!=0):
-        """ for corner in opened:
-            manhattan_Distance = manhattanDistance(currentState, corner)
-            cornerDistance.append((manhattan_Distance,corner))
-        distance,corner = min(cornerDistance)
-        #"""
-        distance, corner = min( [(manhattanDistance(currentState ,corner),corner) for corner in opened] )
-        heuristic = heuristic + distance
+    while opened:
+        
+        # We want to find closest corner
+        # so store all the manhattan distance in the list along with the corner which had that particular distance
+        cornerDistance = []
+        
+        # Find manhattan distance for each corner in opened list.
+        for corner in opened:
+            cornerDistance.append((manhattanDistance(currentState, corner), corner))
+        
+        # Find the corner having minimum distance from the current corner.
+        manhattan_Distance,corner = min(cornerDistance)
+        heuristic = heuristic + manhattan_Distance
         currentState = corner
+        # Remove the corner from the opened list.
         opened.remove(corner) 
 
     return heuristic 
@@ -517,7 +523,31 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    remainingFood = foodGrid.asList()
+
+    #if no food present it should return non negative
+    #since we need to find the distance from current position to the food positions
+    #first check if there is any food i.e. if the length of the food list is 0
+    if len(remainingFood) == 0:
+        return 0
+
+    #now find the distance from position to the food pellet and find the
+    #farthest corner from the present state and calculate
+    # 1. manhattan distance
+    # 2. euclidean - didnt work
+    # 3. better?
+
+    distanceList = []
+
+    for food in remainingFood:
+        #append to the distance list the manhattan distance
+        distanceList.append(util.manhattanDistance(position, food))
+
+    #find the maximum distance food pellet and return it
+    mDistance = max(distanceList)
+
+    return mDistance # Default to trivial solution
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -548,6 +578,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
+        
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
