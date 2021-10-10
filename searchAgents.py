@@ -523,31 +523,42 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    remainingFood = foodGrid.asList()
-
-    #if no food present it should return non negative
-    #since we need to find the distance from current position to the food positions
-    #first check if there is any food i.e. if the length of the food list is 0
-    if len(remainingFood) == 0:
+    # from util import manhattanDistance
+    
+    # foodGrid is a Grid of either True or False.
+    # foodGrid.asList() returns the list of food coordinates.
+    remainingFoodPositions = foodGrid.asList()
+    
+    # As we want to find the distance from current position to the food positions, 
+    # we should first check if there is any food.
+    # We can do this by checking the length of the food list.
+    # If length is zero, then no food is present, so we will simply return zero.
+    if len(remainingFoodPositions) == 0:
         return 0
 
-    #now find the distance from position to the food pellet and find the
-    #farthest corner from the present state and calculate
-    # 1. manhattan distance
-    # 2. euclidean - didnt work
-    # 3. better?
+    # List to store distances from current state to food.
+    distance = []
 
-    distanceList = []
+    # Calculate the mazeDistance from current postion to the food dot.
+    # And store it into the distance list.
+    for remainingFood in remainingFoodPositions:
+        
+        """
+        If we use manhattanDistance then the algorithm expands total of 9551 nodes to to reach to the goal state.
+        This is also correct. But we can optimize this solution by using mazeDistance(). 
+        """
+        # distance.append(util.manhattanDistance(position, remainingFood))
 
-    for food in remainingFood:
-        #append to the distance list the manhattan distance
-        distanceList.append(util.manhattanDistance(position, food))
+        """
+        mazeDistance provides more optimized solution by expanding 4137 nodes only.
+        """
+        #append the mazeDistance to the distance list.
+        distance.append(mazeDistance(position, remainingFood, problem.startingGameState))
 
     #find the maximum distance food pellet and return it
-    mDistance = max(distanceList)
+    maxDistance = max(distance)
 
-    return mDistance # Default to trivial solution
-
+    return maxDistance 
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
